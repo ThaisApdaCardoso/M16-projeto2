@@ -86,13 +86,15 @@ elif opcao == "Visualização de Dados":
     ax.set_ylabel('Frequência')
     st.pyplot(fig)
 
-    # Heatmap de Correlação
-    st.subheader("Correlação entre Variáveis")
-    fig, ax = plt.subplots(figsize=(10, 8))
-    corr_matrix = renda.corr()
-    sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap='coolwarm', ax=ax)
-    ax.set_title('Mapa de Correlação')
-    st.pyplot(fig)
+# Heatmap de Correlação - Selecionar apenas variáveis numéricas
+st.subheader("Correlação entre Variáveis")
+numerical_cols = renda.select_dtypes(include=['float64', 'int64']).columns
+corr_matrix = renda[numerical_cols].corr()
+
+fig, ax = plt.subplots(figsize=(10, 8))
+sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap='coolwarm', ax=ax)
+ax.set_title('Mapa de Correlação')
+st.pyplot(fig)
 
     # Boxplot de Renda por Educação
     st.subheader("Renda por Nível de Educação")
