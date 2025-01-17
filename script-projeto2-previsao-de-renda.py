@@ -12,11 +12,13 @@ Original file is located at
 import streamlit as st
 import pandas as pd
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 
-# Carregando os dados e treinar o modelo (esta parte seria feita antes)
-renda = pd.read_csv('previsao_de_renda.csv')  # Seu dataset
+# Carregando os dados e treinar o modelo
+renda = pd.read_csv('previsao_de_renda.csv')
 X = renda.drop(columns=['renda'])
 y = renda['renda']
 X = pd.get_dummies(X, drop_first=True)
@@ -24,40 +26,79 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 rf_model = RandomForestRegressor(random_state=42)
 rf_model.fit(X_train, y_train)
 
-# Configurando o Streamlit
-st.title("Previsão de Renda")
-st.write("Preencha as informações abaixo para prever a renda de um cliente.")
+# Configuração do Streamlit
+st.title("Previsão de Renda com Visualizações")
+st.write("Este aplicativo prevê a renda de um cliente e apresenta análises do dataset.")
 
-# Campos do formulário
-sexo = st.selectbox("Sexo", ["Feminino", "Masculino"])
-idade = st.slider("Idade", 18, 100, 30)
-educacao = st.selectbox("Nível de Educação", ["Ensino Médio", "Superior Completo", "Pós-graduação"])
-estado_civil = st.selectbox("Estado Civil", ["Solteiro", "Casado", "Separado", "Viúvo"])
-tipo_renda = st.selectbox("Tipo de Renda", ["Assalariado", "Empresário", "Pensionista", "Servidor Público"])
-posse_de_veiculo = st.checkbox("Possui Veículo?")
-posse_de_imovel = st.checkbox("Possui Imóvel?")
-tempo_emprego = st.slider("Tempo de Emprego (anos)", 0, 40, 5)
-qt_pessoas_residencia = st.slider("Quantidade de Pessoas na Residência", 1, 10, 2)
+# Sidebar para navegação
+st.sidebar.title("Navegação")
+opcao = st.sidebar.radio(
+    "Escolha uma opção",
+    ["Previsão de Renda", "Visualização de Dados"]
+)
 
-# Processando os dados do usuário
-input_data = {
-    'sexo': [sexo],
-    'idade': [idade],
-    'educacao': [educacao],
-    'estado_civil': [estado_civil],
-    'tipo_renda': [tipo_renda],
-    'posse_de_veiculo': [posse_de_veiculo],
-    'posse_de_imovel': [posse_de_imovel],
-    'tempo_emprego': [tempo_emprego],
-    'qt_pessoas_residencia': [qt_pessoas_residencia]
-}
-input_df = pd.DataFrame(input_data)
+# Seção de Previsão de Renda
+if opcao == "Previsão de Renda":
+    st.header("Preencha as informações abaixo:")
+    sexo = st.selectbox("Sexo", ["Feminino", "Masculino"])
+    idade = st.slider("Idade", 18, 100, 30)
+    educacao = st.selectbox("Nível de Educação", ["Ensino Médio", "Superior Completo", "Pós-graduação"])
+    estado_civil = st.selectbox("Estado Civil", ["Solteiro", "Casado", "Separado", "Viúvo"])
+    tipo_renda = st.selectbox("Tipo de Renda", ["Assalariado", "Empresário", "Pensionista", "Servidor Público"])
+    posse_de_veiculo = st.checkbox("Possui Veículo?")
+    posse_de_imovel = st.checkbox("Possui Imóvel?")
+    tempo_emprego = st.slider("Tempo de Emprego (anos)", 0, 40, 5)
+    qt_pessoas_residencia = st.slider("Quantidade de Pessoas na Residência", 1, 10, 2)
 
-# Garantindo compatibilidade com o modelo
-input_df = pd.get_dummies(input_df, drop_first=True)
-input_df = input_df.reindex(columns=X.columns, fill_value=0)
+    # Processando os dados do usuário
+    input_data = {
+        'sexo': [sexo],
+        'idade': [idade],
+        'educacao': [educacao],
+        'estado_civil': [estado_civil],
+        'tipo_renda': [tipo_renda],
+        'posse_de_veiculo': [posse_de_veiculo],
+        'posse_de_imovel': [posse_de_imovel],
+        'tempo_emprego': [tempo_emprego],
+        'qt_pessoas_residencia': [qt_pessoas_residencia]
+    }
+    input_df = pd.DataFrame(input_data)
 
-# Prevendo a renda
-if st.button("Prever Renda"):
-    previsao = rf_model.predict(input_df)
-    st.success(f"A renda prevista para o cliente é R$ {previsao[0]:,.2f}")
+    # Garantindo compatibilidade com o modelo
+    input_df = pd.get_dummies(input_df, drop_first=True)
+    input_df = input_df.reindex(columns=X.columns, fill_value=0)
+
+    # Prevendo a renda
+    if st.button("Prever Renda"):
+        previsao = rf_model.predict(input_df)
+        st.success(f"A renda prevista para o cliente é R$ {previsao[0]:,.2f}")
+
+# Seção de Visualização de Dados
+elif opcao == "Visualização de Dados":
+    st.header("Análise Visual dos Dados")
+
+    # Distribuição da Renda
+    st.subheader("Distribuição da Renda")
+    fig, ax = plt.subplots()
+    sns.histplot(renda['renda'], bins=30, kde=True, ax=ax, color='skyblue')
+    ax.set_title('Distribuição da Renda')
+    ax.set_xlabel('Renda')
+    ax.set_ylabel('Frequência')
+    st.pyplot(fig)
+
+    # Heatmap de Correlação
+    st.subheader("Correlação entre Variáveis")
+    fig, ax = plt.subplots(figsize=(10, 8))
+    corr_matrix = renda.corr()
+    sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap='coolwarm', ax=ax)
+    ax.set_title('Mapa de Correlação')
+    st.pyplot(fig)
+
+    # Boxplot de Renda por Educação
+    st.subheader("Renda por Nível de Educação")
+    fig, ax = plt.subplots()
+    sns.boxplot(x='educacao', y='renda', data=renda, ax=ax, palette='viridis')
+    ax.set_title('Boxplot da Renda por Educação')
+    ax.set_xlabel('Educação')
+    ax.set_ylabel('Renda')
+    st.pyplot(fig)
