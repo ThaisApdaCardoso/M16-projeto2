@@ -4,4 +4,4 @@ matplotlib
 ydata_profiling
 numpy
 streamlit
-sklearn
+scikit-learn
