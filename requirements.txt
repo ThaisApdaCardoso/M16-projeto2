@@ -4,3 +4,5 @@ matplotlib
 ydata_profiling
 numpy
 streamlit
+sklearn.ensemble
+sklearn.model_selection
