@@ -37,6 +37,9 @@ Objetivo: Criar um modelo que ajude a instituição a prever a renda dos cliente
 | renda                   |  Renda mensal do cliente em reais                                   | Numérica|
 """
 
+!pip install ydata-profiling
+
+
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
