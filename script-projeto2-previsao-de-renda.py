@@ -12,8 +12,7 @@ Original file is located at
 import streamlit as st
 import pandas as pd
 import numpy as np
-from sklearn.ensemble
-from sklearn.model_selection
+
 
 # Carregando os dados e treinar o modelo (esta parte seria feita antes)
 renda = pd.read_csv('previsao_de_renda.csv')  # Seu dataset
