@@ -26,6 +26,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 rf_model = RandomForestRegressor(random_state=42)
 rf_model.fit(X_train, y_train)
 
+# Ajustando valores de renda para no máximo 100.000
+renda['renda'] = renda['renda'].clip(upper=100000)
+
 # Configuração do Streamlit
 st.title("Previsão de Renda com Visualizações")
 st.write("Este aplicativo prevê a renda de um cliente e apresenta análises do dataset.")
