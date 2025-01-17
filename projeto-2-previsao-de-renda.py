@@ -37,7 +37,6 @@ Objetivo: Criar um modelo que ajude a instituição a prever a renda dos cliente
 | renda                   |  Renda mensal do cliente em reais                                   | Numérica|
 """
 
-!pip install pandas-profiling
 !pip install ydata-profiling
 !pip install pydantic-settings
 !pip install streamlit
